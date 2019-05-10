@@ -120,8 +120,11 @@ echo "Will run mongo"
 nohup bash -c " mongod --config /etc/mongod.conf 2>&1 &" && sleep 4
 #cat nohup.out
 
+.venv/bin/pip install git+https://github.com/MongoEngine/django-mongoengine.git
+.venv/bin/pip install pymongo==3.0
+
 
 #Run tests
 echo "Will run the tests"
-#.venv/bin/python manage.py test OnToology
+.venv/bin/python manage.py test OnToology
 

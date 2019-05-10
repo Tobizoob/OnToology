@@ -16,6 +16,10 @@
 # @author Ahmad Alobaid
 #
 
+from django_mongoengine import Document, EmbeddedDocument
+
+from django_mongoengine.fields import StringField, DateTimeField, ListField, ReferenceField, BooleanField, FloatField
+
 
 from mongoengine import Document, StringField, DateTimeField, ListField, ReferenceField, BooleanField, FloatField
 # from mongoengine.django.auth import User

@@ -31,25 +31,10 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 print 'BASE_DIR: '+BASE_DIR
 
-AUTHENTICATION_BACKENDS = (
-    'mongoengine.django.auth.MongoEngineBackend',
-)
-
 LOGIN_URL = '/login'
-
 
 #Needed for the tests
 TEST_RUNNER = 'OnToology.tests.__init__.NoSQLTestRunner'
-
-
-#The below 5 lines are used for login with facebook purposes
-#SOCIAL_AUTH_MODELS = 'social_auth.db.mongoengine_models'
-#SOCIAL_AUTH_USERNAME_IS_FULL_EMAIL = True
-GITHUB_APP_ID = 'bbfc39dd5b6065bbe53b'
-GITHUB_API_SECRET = '60014ba718601441f542213855607810573c391e'
-GITHUB_LOCAL_APP_ID = '3995f5db01f035de44c6'
-GITHUB_LOCAL_API_SECRET = '141f896e53db4a4427db177f1ef2c9975e8a3c1f'
-
 
 try:
     from localwsgi import *
@@ -59,17 +44,12 @@ except Exception as e:
     print e
 
 
+# These are local for tests (not live to automated tests)
+GITHUB_APP_ID = 'bbfc39dd5b6065bbe53b'
+GITHUB_API_SECRET = '60014ba718601441f542213855607810573c391e'
+GITHUB_LOCAL_APP_ID = '3995f5db01f035de44c6'
+GITHUB_LOCAL_API_SECRET = '141f896e53db4a4427db177f1ef2c9975e8a3c1f'
 
-# client_id_login = os.environ['client_id_login']       # 'e2ea731b481438fd1675'
-# client_id_public = os.environ['client_id_public']     # '878434ff1065b7fa5b92'
-# client_id_private = os.environ['client_id_private']   # 'dd002c8587d08edfaf5f'
-#
-# client_secret_login = os.environ['client_secret_login']        # 'ba0f149934e3d78816cbd89d1f3c5109b82898ab'
-# client_secret_public = os.environ['client_secret_public']       # 'c76144cbbbf5df080df0232928af9811d78792dd'
-# client_secret_private = os.environ['client_secret_private']      # 'c5fbaa760362ba23f7c8d07c35021ac111ca5418'
-# client_id = GITHUB_APP_ID  # 'bbfc39dd5b6065bbe53b'
-# client_secret = GITHUB_API_SECRET  # '60014ba718601441f542213855607810573c391e'
-# host = 'http://54.172.63.231'
 
 
 host = 'http://ontoology.linkeddata.es'
@@ -86,29 +66,6 @@ else:
     print "Going remote"
     print os.environ
 
-from mongoengine import connect
-MONGO_DATABASE_NAME = "OnToology"
-if "db_name" in os.environ:
-    MONGO_DATABASE_NAME = os.environ["db_name"]
-
-if 'db_username' not in os.environ or os.environ['db_username'].strip() == '':
-    print "no auth"
-    connect(MONGO_DATABASE_NAME)
-else:
-    print "with auth"
-    connect(MONGO_DATABASE_NAME, host=os.environ['db_host'], port=int(os.environ['db_port']),
-            username=os.environ['db_username'], password=os.environ['db_password'],
-            )
-            #authentication_mechanism='MONGODB-CR')
-            #authentication_mechanism='SCRAM-SHA-1')
-
-
-AUTH_USER_MODEL = 'mongo_auth.MongoUser'
-MONGOENGINE_USER_DOCUMENT = 'mongoengine.django.auth.User'
-SESSION_ENGINE = 'mongoengine.django.sessions'
-SESSION_SERIALIZER = 'mongoengine.django.sessions.BSONSerializer'
-# Quick-start development settings - unsuitable for production
-# See https://docs.djangoproject.com/en/1.7/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'xj1c6fel(z5@=%(br!j)u155a71j*^u_b+2'
@@ -160,9 +117,46 @@ INSTALLED_APPS = (
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'mongoengine.django.mongo_auth',
     'OnToology',
+    'django_mongoengine',
+    'django_mongoengine.mongo_auth',
+    'django_mongoengine.mongo_admin',
 )
+
+AUTH_USER_MODEL = 'mongo_auth.MongoUser'
+
+AUTHENTICATION_BACKENDS = (
+    'django_mongoengine.mongo_auth.backends.MongoEngineBackend',
+)
+
+MONGO_DATABASE_NAME = "OnToology"
+if "db_name" in os.environ:
+    MONGO_DATABASE_NAME = os.environ["db_name"]
+
+if 'db_username' not in os.environ or os.environ['db_username'].strip() == '':
+    print "no auth"
+    MONGODB_DATABASES = {
+        "default": {
+            "name": MONGO_DATABASE_NAME,
+            "tz_aware": True,  # if you using timezones in django (USE_TZ = True)
+        },
+    }
+else:
+    print "with auth"
+    MONGODB_DATABASES = {
+        "default": {
+            "name": MONGO_DATABASE_NAME,
+            "host": os.environ['db_host'],
+            "port": int(os.environ['db_port']),
+            "password": os.environ['db_password'],
+            "username": os.environ['db_username'],
+            "tz_aware": True, # if you using timezones in django (USE_TZ = True)
+        },
+    }
+
+SESSION_ENGINE = 'django_mongoengine.sessions'
+SESSION_SERIALIZER = 'django_mongoengine.sessions.BSONSerializer'
+
 
 MIDDLEWARE_CLASSES = (
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -192,12 +186,12 @@ WSGI_APPLICATION = 'OnToology.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/1.7/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.dummy',
-    }
-}
+#
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.dummy',
+#     }
+# }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.7/topics/i18n/

@@ -3,8 +3,10 @@ read -p 'This will update the docker image on docker hub, are you sure? (y/N) ' 
 if [[ $execflag == y* || $execflag == Y* ]]
 then
     echo Preparing to push ontoology image to docker hub
-    docker image build -t ahmad88me/ontoology:latest -f Dockerfile.base .
-    docker image push ahmad88me/ontoology:latest
+    docker image build -t ahmad88me/ontoology:django1.7 -f Dockerfile.base .
+    docker image push ahmad88me/ontoology:django1.7
+#    docker image build -t ahmad88me/ontoology:latest -f Dockerfile.base .
+#    docker image push ahmad88me/ontoology:latest
 else
     echo The docker image will not be updated in docker hub
 fi
